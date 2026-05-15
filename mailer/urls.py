@@ -10,12 +10,12 @@ from .views import (
 urlpatterns = [
 
     # HOME PAGE
-    path("", home),
+    path("", home, name="home"),
 
     # API
-    path("upload/", upload_file),
-    path("download/<str:job_id>/", download_emails),
+    path("upload/", upload_file, name="upload_file"),
+    path("download/<str:job_id>/", download_emails, name="download_emails"),
 
     # TEST
-    path("test/", test_api),
+    path("test/", test_api, name="test_api"),
 ]
