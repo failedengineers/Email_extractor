@@ -1,29 +1,16 @@
-ALLOWED_EXTENSIONS = [
-    ".csv",
-    ".xlsx"
-]
+import os
 
-MAX_FILE_SIZE = 5 * 1024 * 1024
+ALLOWED_EXTENSIONS = {".xlsx", ".csv",}
+MAX_FILE_SIZE_MB = 5
 
 
-def validate_uploaded_file(file):
+def validate_uploaded_file(uploaded_file):
+    ext = os.path.splitext(uploaded_file.name)[1].lower()
 
-    # file size
-    if file.size > MAX_FILE_SIZE:
-        return False, "File too large"
+    if ext not in ALLOWED_EXTENSIONS:
+        return False, f"Unsupported file type: {ext}"
 
-    # extension
-    filename = file.name.lower()
-
-    valid = False
-
-    for ext in ALLOWED_EXTENSIONS:
-
-        if filename.endswith(ext):
-            valid = True
-            break
-
-    if not valid:
-        return False, "Invalid file type"
+    if uploaded_file.size > MAX_FILE_SIZE_MB * 1024 * 1024:
+        return False, f"File too large. Max size is {MAX_FILE_SIZE_MB}MB"
 
     return True, None
