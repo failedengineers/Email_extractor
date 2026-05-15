@@ -2,7 +2,7 @@ import re
 import csv
 from openpyxl import load_workbook
 
-EMAIL_REGEX = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+EMAIL_REGEX = r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b"
 
 
 def extract_emails(file_path):
