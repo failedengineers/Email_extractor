@@ -4,14 +4,14 @@ import uuid
 
 from django.conf import settings
 from django.core.cache import cache
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .utils.extractor import extract_emails
 from .utils.validators import validate_uploaded_file
-
 
 PREVIEW_LIMIT = 20
 CACHE_TTL = 60 * 30  # 30 minutes
@@ -31,10 +31,6 @@ def test_api(request):
 
 @api_view(["POST"])
 def upload_file(request):
-    os.makedirs(
-    "media/temp",
-    exist_ok=True
-)
     uploaded_file = request.FILES.get("file")
 
     if not uploaded_file:
@@ -50,34 +46,45 @@ def upload_file(request):
             "message": error
         }, status=400)
 
-    extension = uploaded_file.name.split(".")[-1]
-    filename = f"{uuid.uuid4()}.{extension}"
+    temp_dir = os.path.join(settings.MEDIA_ROOT, "temp")
+    os.makedirs(temp_dir, exist_ok=True)
 
-    temp_path = os.path.join(
-        settings.MEDIA_ROOT,
-        "temp",
-        filename
-    )
+    extension = uploaded_file.name.split(".")[-1].lower()
+    upload_name = f"{uuid.uuid4()}.{extension}"
+    temp_upload_path = os.path.join(temp_dir, upload_name)
 
-    with open(temp_path, "wb+") as f:
-        for chunk in uploaded_file.chunks():
-            f.write(chunk)
+    job_id = str(uuid.uuid4())
+    output_name = f"{job_id}.csv"
+    temp_output_path = os.path.join(temp_dir, output_name)
 
     try:
-        emails = extract_emails(temp_path)
-        job_id = str(uuid.uuid4())
+        # Save uploaded file safely
+        with open(temp_upload_path, "wb+") as f:
+            for chunk in uploaded_file.chunks():
+                f.write(chunk)
 
-        cache.set(
-            f"emails_{job_id}",
-            emails,
-            timeout=CACHE_TTL
-        )
+        # Extract emails safely
+        emails = extract_emails(temp_upload_path)
+        unique_emails = sorted(set(emails))
+
+        # Write result CSV
+        with open(temp_output_path, "w", newline="", encoding="utf-8") as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(["email"])
+            for email in unique_emails:
+                writer.writerow([email])
+
+        # Store only the output file path in cache
+        cache.set(f"emails_file_{job_id}", temp_output_path, timeout=CACHE_TTL)
 
         response = {
             "success": True,
             "job_id": job_id,
-            "total_emails": len(emails),
-            "preview_emails": emails[:PREVIEW_LIMIT]
+            "total_emails": len(unique_emails),
+            "preview_emails": unique_emails[:PREVIEW_LIMIT],
+            "download_url": request.build_absolute_uri(
+                reverse("download_emails", args=[job_id])
+            ),
         }
 
     except Exception as e:
@@ -86,31 +93,35 @@ def upload_file(request):
             "message": str(e)
         }
 
+        # Clean up failed output file if created
+        if os.path.exists(temp_output_path):
+            try:
+                os.remove(temp_output_path)
+            except Exception:
+                pass
+
     finally:
-        if os.path.exists(temp_path):
-            os.remove(temp_path)
+        # Remove uploaded temp file
+        if os.path.exists(temp_upload_path):
+            try:
+                os.remove(temp_upload_path)
+            except Exception:
+                pass
 
     return Response(response)
 
 
 def download_emails(request, job_id):
-    emails = cache.get(f"emails_{job_id}")
+    file_path = cache.get(f"emails_file_{job_id}")
 
-    if not emails:
+    if not file_path or not os.path.exists(file_path):
         return HttpResponse(
             "Download expired or unavailable.",
             status=404
         )
 
-    response = HttpResponse(
-        content_type="text/csv"
+    return FileResponse(
+        open(file_path, "rb"),
+        as_attachment=True,
+        filename="extracted_emails.csv"
     )
-    response["Content-Disposition"] = 'attachment; filename="emails.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow(["email"])
-
-    for email in emails:
-        writer.writerow([email])
-
-    return response
