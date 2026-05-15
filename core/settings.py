@@ -14,7 +14,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com"
+]
 
 # =========================
 # APPS
@@ -40,9 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
     "whitenoise.middleware.WhiteNoiseMiddleware",
-
     'corsheaders.middleware.CorsMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -53,10 +55,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# =========================
-# URLS
-# =========================
-
 ROOT_URLCONF = 'core.urls'
 
 # =========================
@@ -66,13 +64,8 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-
-        'DIRS': [
-            BASE_DIR / "templates"
-        ],
-
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
-
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.request',
@@ -82,10 +75,6 @@ TEMPLATES = [
         },
     },
 ]
-
-# =========================
-# WSGI
-# =========================
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
@@ -105,18 +94,10 @@ DATABASES = {
 # =========================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # =========================
@@ -124,11 +105,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # =========================
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 # =========================
@@ -136,23 +114,16 @@ USE_TZ = True
 # =========================
 
 STATIC_URL = "/static/"
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static"
-]
-
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_STORAGE = (
-    "whitenoise.storage.CompressedManifestStaticFilesStorage"
-)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # =========================
 # MEDIA FILES
 # =========================
 
 MEDIA_URL = "/media/"
-
 MEDIA_ROOT = BASE_DIR / "media"
 
 # =========================
@@ -162,11 +133,26 @@ MEDIA_ROOT = BASE_DIR / "media"
 CORS_ALLOW_ALL_ORIGINS = True
 
 # =========================
+# CACHE (IMPORTANT FIX)
+# =========================
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
+# =========================
 # SECURITY HEADERS
 # =========================
 
 SECURE_BROWSER_XSS_FILTER = True
-
 X_FRAME_OPTIONS = "DENY"
-
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# =========================
+# DEFAULT AUTO FIELD
+# =========================
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
