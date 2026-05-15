@@ -72,7 +72,7 @@ uploadBtn.addEventListener("click", async () => {
     formData.append("file", file);
 
     try {
-        const response = await fetch("/api/upload/", {
+        const response = await fetch("/upload/", {
             method: "POST",
             body: formData
         });
@@ -99,7 +99,7 @@ uploadBtn.addEventListener("click", async () => {
         `).join("");
 
         downloadSection.innerHTML = `
-            <a class="download-link" href="/api/download/${downloadJobId}/">
+            <a class="download-link" href="/download/${downloadJobId}/">
                 <button type="button" class="primary-btn">Download Emails CSV</button>
             </a>
         `;
