@@ -1,22 +1,15 @@
-import pandas as pd
 import re
 
-EMAIL_REGEX = r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}"
+EMAIL_REGEX = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
 
 
 def extract_emails(file_path):
-    if file_path.endswith(".csv"):
-        df = pd.read_csv(file_path, dtype=str)
-    else:
-        df = pd.read_excel(file_path, dtype=str)
+    emails = []
 
-    emails = set()
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            found = re.findall(EMAIL_REGEX, line)
+            if found:
+                emails.extend(found)
 
-    for column in df.columns:
-        for value in df[column].dropna():
-            text = str(value)
-            found_emails = re.findall(EMAIL_REGEX, text)
-            for email in found_emails:
-                emails.add(email.lower())
-
-    return list(emails)
+    return emails
