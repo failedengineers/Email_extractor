@@ -31,6 +31,10 @@ def test_api(request):
 
 @api_view(["POST"])
 def upload_file(request):
+    os.makedirs(
+    "media/temp",
+    exist_ok=True
+)
     uploaded_file = request.FILES.get("file")
 
     if not uploaded_file:
