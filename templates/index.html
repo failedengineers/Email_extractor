@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadFlow</title>
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <div class="gradient gradient-1"></div>
+    <div class="gradient gradient-2"></div>
+
+    <main class="container">
+
+        <!-- NAVBAR -->
+
+        <nav class="navbar">
+
+            <div class="logo-wrap">
+
+                <div class="logo-box">
+                    L
+                </div>
+
+                <div>
+                    <div class="logo-text">
+                        LeadFlow
+                    </div>
+
+                    <div class="logo-sub">
+                        Email Extraction Platform
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="nav-right">
+
+                <div class="nav-badge">
+                    No signup required
+                </div>
+
+                <button id="themeToggle" class="theme-btn">
+                    Dark mode
+                </button>
+
+            </div>
+
+        </nav>
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="hero-badge">
+                Smart spreadsheet email extraction
+            </div>
+
+            <h1>
+                Extract emails from spreadsheets in seconds.
+            </h1>
+
+            <p class="hero-text">
+                Upload CSV or XLSX files and instantly generate
+                a clean downloadable email list from every column.
+                Fast, private and built for bulk workflows.
+            </p>
+
+            <div class="hero-tags">
+
+                <div class="tag">CSV / XLSX</div>
+                <div class="tag">Secure Processing</div>
+                <div class="tag">Instant Download</div>
+                <div class="tag">No Database Storage</div>
+
+            </div>
+
+        </section>
+
+        <!-- MAIN CARD -->
+
+        <section class="main-card">
+
+            <div class="upload-top">
+
+                <div>
+                    <h2>
+                        Upload spreadsheet
+                    </h2>
+
+                    <p>
+                        Drag & drop or browse a file from your device.
+                    </p>
+                </div>
+
+                <div class="status-dot"></div>
+
+            </div>
+
+            <input type="file" id="fileInput" accept=".csv,.xlsx" hidden>
+
+            <div class="drop-zone" id="dropZone">
+
+                <div class="upload-icon">
+                    ↑
+                </div>
+
+                <h3>
+                    Drop your file here
+                </h3>
+
+                <p>
+                    Supports .csv and .xlsx files
+                </p>
+
+                <button id="browseBtn" class="secondary-btn">
+                    Browse Files
+                </button>
+
+            </div>
+
+            <div class="file-meta" id="fileMeta">
+                No file selected
+            </div>
+
+            <button id="uploadBtn" class="primary-btn">
+                Extract Emails
+            </button>
+
+            <div class="loading" id="loading">
+
+                <div class="spinner"></div>
+
+                <span>
+                    Processing spreadsheet securely...
+                </span>
+
+            </div>
+
+        </section>
+
+        <!-- STATS -->
+
+        <section class="stats-grid" id="dashboard" style="display:none;">
+
+            <div class="stats-card">
+
+                <div class="stats-label">
+                    Total Emails
+                </div>
+
+                <div class="stats-number" id="emailCount">
+                    0
+                </div>
+
+                <div class="stats-desc">
+                    Unique emails extracted
+                </div>
+
+            </div>
+
+            <div class="stats-card">
+
+                <div class="stats-label">
+                    Export
+                </div>
+
+                <div class="stats-download" id="downloadSection">
+
+                </div>
+
+                <div class="stats-desc">
+                    Download the complete email list
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- PREVIEW -->
+
+        <section class="preview-card" id="resultsWrap" style="display:none;">
+
+            <div class="preview-top">
+
+                <div>
+                    <h3>
+                        Email Preview
+                    </h3>
+
+                    <p id="resultsInfo">
+                    </p>
+                </div>
+
+                <div class="preview-pill">
+                    Preview Only
+                </div>
+
+            </div>
+
+            <div class="email-grid" id="result">
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="{% static 'js/app.js' %}"></script>
+
+</body>
+</html>
